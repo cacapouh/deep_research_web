@@ -1,0 +1,9 @@
+langchain_community~=0.3.23
+langchain-core~=0.3.58
+langchain_postgres
+langchain_openai
+atlassian-python-api
+lxml
+bottle
+psycopg2-binary
+langchain_google_genai

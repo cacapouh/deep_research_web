@@ -1,0 +1,49 @@
+services:
+  # RAGデータを管理するPostgreSQL
+  db:
+    build:
+      context: database
+    ports:
+      - "6024:5432"
+    environment:
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_HOST_AUTH_METHOD: 'trust'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+  # confluenceのデータを取得して、PostgreSQLに投入 & ドキュメント取得用APIサーバーを立てる
+  confluence-bulk-insert:
+    build:
+      context: rag/confluence
+    working_dir: /app
+    volumes:
+      - ./rag/confluence:/app
+    command: "/bin/bash -c 'python bulk_insert.py && python server.py'"
+    ports:
+      - "18080:18080"
+    env_file:
+      - .env
+    healthcheck:
+      test: "curl -f http://0.0.0.0:18080/ready || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      db:
+        condition: service_healthy
+  # DeepResearchの実装とStreamlitのUI
+  main:
+    build:
+      context: app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app:/work
+    env_file:
+      - .env
+    depends_on:
+      confluence-bulk-insert:
+        condition: service_healthy
