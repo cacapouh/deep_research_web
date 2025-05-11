@@ -1,7 +1,4 @@
-import time
-
 import psycopg2
-from langchain_google_genai._common import GoogleGenerativeAIError
 from langchain_postgres import PGVector
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
@@ -22,20 +19,8 @@ text_splitter = CharacterTextSplitter(
 )
 
 
-def with_retry(process, count=3):
-    if count <= 0:
-        return process()
-
-    try:
-        return process()
-    except GoogleGenerativeAIError as e:
-        print(f"Retry {count}", e)
-        time.sleep(10)
-        return with_retry(process, count-1)
-
-
 def search_all(query_list: list[str]):
-    return [with_retry(lambda:search(query)) for query in query_list]
+    return [search(query) for query in query_list]
 
 
 def search(query: str):

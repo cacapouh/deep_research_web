@@ -27,10 +27,10 @@ class Configuration:
     number_of_queries: int = 2 # Number of search queries to generate per iteration
     max_search_depth: int = 2 # Maximum number of reflection + search iterations
     planner_provider: str = "google_genai"
-    planner_model: str = "gemini-2.5-flash-preview-04-17"
+    planner_model: str = "gemini-2.5-pro-preview-05-06"
     planner_model_kwargs: Optional[Dict[str, Any]] = None # kwargs for planner_model
     writer_provider: str = "google_genai"
-    writer_model: str = "gemini-2.5-flash-preview-04-17"
+    writer_model: str = "gemini-2.5-pro-preview-05-06"
     writer_model_kwargs: Optional[Dict[str, Any]] = None # kwargs for writer_model
 
     # Multi-agent specific configuration

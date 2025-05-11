@@ -1,10 +1,8 @@
 import os
-import time
 
 from langchain_community.document_loaders import ConfluenceLoader
 import json
 import psycopg2
-from langchain_google_genai._common import GoogleGenerativeAIError
 from langchain_postgres import PGVector
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
@@ -41,18 +39,6 @@ loader = ConfluenceLoader(
 )
 
 
-def with_retry(process, count=3):
-    if count <= 0:
-        return process()
-
-    try:
-        return process()
-    except GoogleGenerativeAIError as e:
-        print(f"Retry {count}", e)
-        time.sleep(60)
-        return with_retry(process, count-1)
-
-
 def insert_all_documents():
     documents = loader.load()
     records = []
@@ -70,7 +56,7 @@ def insert_all_documents():
     connection.commit()
     # Embeddingしたデータの投入
     split_docs = text_splitter.split_documents(documents)
-    with_retry(lambda: vector_store.add_documents(split_docs))
+    vector_store.add_documents(split_docs)
 
 
 if __name__ == '__main__':

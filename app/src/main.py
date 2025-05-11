@@ -14,7 +14,7 @@ async def main():
         st.session_state.message_history = []
 
     if user_input := st.chat_input("検索トピックを入力"):
-        with st.spinner("Agent is typing ..."):
+        with st.spinner("Processing ..."):
             response: str = await deep_research(user_input)
 
         st.session_state.message_history.append(("user", user_input))

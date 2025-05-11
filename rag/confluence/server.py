@@ -1,5 +1,3 @@
-import os
-from langchain_community.document_loaders import ConfluenceLoader
 import json
 from bottle import route, run
 import psycopg2
@@ -14,10 +12,7 @@ def route_documents():
     result = []
     cur.execute("SELECT * FROM documents")
     for record in cur:
-        try:
-            result.append(json.loads(record[1]))
-        except Exception as e:
-            raise Exception("Error: " + str(e) + "\n" + str(record))
+        result.append(json.loads(record[1]))
     return json.dumps(result)
 
 
