@@ -6,6 +6,7 @@ import psycopg2
 from langchain_postgres import PGVector
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
+import tiktoken
 
 vector_store = PGVector(
     connection="postgresql+psycopg://user:postgres@db:5432/user",
@@ -39,6 +40,13 @@ loader = ConfluenceLoader(
 )
 
 
+def num_tokens_from_string(string: str, encoding_name: str="cl100k_base") -> int:
+    """Returns the number of tokens in a text string."""
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
+
+
 def insert_all_documents():
     documents = loader.load()
     records = []
@@ -49,6 +57,9 @@ def insert_all_documents():
                 'page_content': str(doc.page_content)
             }
         )
+    # トークン数の試算
+    tokens = num_tokens_from_string(json.dumps(records))
+    print(f"Token count: {tokens}")
 
     # ドキュメント本文の投入
     for record in records:
